@@ -1,0 +1,172 @@
+openapi: 3.1.0
+info:
+  title: Ekwanza Payment API
+  version: 1.0.0
+  description: |
+    Official API documentation for Ekwanza Payment Integration.
+    Covers Ticket API, SendToCustomer and Gateway Charges (REF & GPO).
+
+servers:
+  - url: https://api.ekwanza.ao
+    description: Production Server
+  - url: https://sandbox.ekwanza.ao
+    description: Sandbox Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+
+    TicketResponse:
+      type: object
+      properties:
+        Code:
+          type: string
+        QRCode:
+          type: string
+        Status:
+          type: integer
+          enum: [0,1,2,3]
+        ExpirationDate:
+          type: string
+          format: date-time
+
+    TicketStatusResponse:
+      type: object
+      properties:
+        Amount:
+          type: string
+        Code:
+          type: string
+        CreationDate:
+          type: string
+        ExpirationDate:
+          type: string
+        Status:
+          type: integer
+          enum: [0,1,2,3]
+
+    SendToCustomerRequest:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            mobileNumber:
+              type: string
+            token:
+              type: string
+            amount:
+              type: string
+            operationCode:
+              type: string
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+            signature:
+              type: string
+
+    ChargeRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+        merchantTransactionId:
+          type: string
+        paymentMethod:
+          type: string
+        paymentInfo:
+          type: object
+        options:
+          type: object
+
+paths:
+
+  /Ticket/{notificationToken}:
+    post:
+      summary: Create Payment Ticket
+      parameters:
+        - in: path
+          name: notificationToken
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: amount
+          required: true
+          schema:
+            type: number
+        - in: query
+          name: referenceCode
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: mobileNumber
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+
+  /Ticket/{notificationToken}/{ticketCode}:
+    get:
+      summary: Get Ticket Status
+      parameters:
+        - in: path
+          name: notificationToken
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: ticketCode
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ticket status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketStatusResponse'
+
+  /Operations/SendToCustomer:
+    post:
+      summary: Send Payment to Customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendToCustomerRequest'
+      responses:
+        '200':
+          description: Payment processed
+
+  /v2.0/charges:
+    post:
+      summary: Create Gateway Charge (REF / GPO)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargeRequest'
+      responses:
+        '200':
+          description: Charge created
