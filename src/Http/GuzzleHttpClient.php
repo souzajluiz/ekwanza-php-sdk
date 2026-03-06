@@ -21,14 +21,36 @@ class GuzzleHttpClient implements HttpClientInterface
 
     public function get(string $uri, array $headers = []): ResponseInterface
     {
-        return $this->client->request('GET', $uri, ['headers' => $headers]);
+        try {
+            return $this->client->request('GET', $uri, ['headers' => $headers]);
+        }
+        catch (\GuzzleHttp\Exception\RequestException $e) {
+            if ($e->hasResponse()) {
+                return $e->getResponse();
+            }
+            throw $e;
+        }
     }
 
     public function post(string $uri, array $body = [], array $headers = []): ResponseInterface
     {
-        return $this->client->request('POST', $uri, [
-            'headers' => $headers,
-            'json' => $body
-        ]);
+        $options = ['headers' => $headers];
+
+        if (strcasecmp($headers['Content-Type'] ?? '', 'application/x-www-form-urlencoded') === 0) {
+            $options['form_params'] = $body;
+        }
+        else {
+            $options['json'] = $body;
+        }
+
+        try {
+            return $this->client->request('POST', $uri, $options);
+        }
+        catch (\GuzzleHttp\Exception\RequestException $e) {
+            if ($e->hasResponse()) {
+                return $e->getResponse();
+            }
+            throw $e;
+        }
     }
 }
