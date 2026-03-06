@@ -50,7 +50,6 @@ class GatewayService extends BaseService
     /**
      * Create a charge on the Gateway.
      *
-     * @param string $tenantId The Azure tenant ID for auth
      * @param float $amount The amount to charge
      * @param string $merchantTransactionId The merchant transaction unique ID
      * @param string $paymentMethod The payment method (e.g. MULTICAIXA)
@@ -58,7 +57,6 @@ class GatewayService extends BaseService
      * @return array
      */
     public function createCharge(
-        string $tenantId,
         float $amount,
         string $merchantTransactionId,
         string $paymentMethod,
@@ -73,11 +71,7 @@ class GatewayService extends BaseService
         $headers = [
             'Authorization' => "Bearer {$token}",
             'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'Cookie' => [
-                'ARRAffinity=61d869b39c80b800fa66bdafa3089846c090ff86f5d67f887aa34253e56405fb',
-                'ARRAffinitySameSite=61d869b39c80b800fa66bdafa3089846c090ff86f5d67f887aa34253e564'
-            ]
+            'Content-Type' => 'application/json'
         ];
 
         $payload = [
