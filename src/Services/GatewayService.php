@@ -78,7 +78,7 @@ class GatewayService extends BaseService
             'amount' => $amount,
             'currency' => 'AOA',
             'merchantTransactionId' => $merchantTransactionId,
-            'paymentMethod' => 'REF_bfeeb4b9-31d4-4030-aed4-a204ac19163e',
+            'paymentMethod' => $paymentMethod,
             'options' => [
                 'MerchantIdentifier' => $this->config->getMerchantRegistrationNumber(),
                 'ApiKey' => $this->config->getApiKey(),
