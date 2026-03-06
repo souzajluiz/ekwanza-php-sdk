@@ -101,8 +101,6 @@ class GatewayService extends BaseService
 
         $response = $this->http->post($uri, $payload, $headers);
 
-        dd($response, $uri, $payload, $headers);
-
         return $this->handleResponse($response);
     }
 }
